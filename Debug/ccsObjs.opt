@@ -1,4 +1,3 @@
-"./empty.o"
 "./ti_msp_dl_config.o"
 "./startup_mspm0g350x_ticlang.o"
 "./MSPM0/clock.o"
@@ -6,6 +5,7 @@
 "./OLED_Hardware_I2C/oled_hardware_i2c.o"
 "./motor/motor.o"
 "./motor/pid.o"
+"./user/main.o"
 "./user/user.o"
 -l"./device_linker.cmd"
 -ldevice.cmd.genlibs
