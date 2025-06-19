@@ -1,6 +1,6 @@
 # FIXED
 
-MSPM0/interrupt.o: ../MSPM0/interrupt.c \
+MPU6050/mspm0_i2c.o: ../MPU6050/mspm0_i2c.c \
  ti_msp_dl_config.h \
  C:/APPLICATION/ti_SDK/mspm0_sdk_2_04_00_06/source/ti/devices/msp/msp.h \
  C:/APPLICATION/ti_SDK/mspm0_sdk_2_04_00_06/source/ti/devices/DeviceFamily.h \
@@ -75,11 +75,8 @@ MSPM0/interrupt.o: ../MSPM0/interrupt.c \
  C:/APPLICATION/ti_SDK/mspm0_sdk_2_04_00_06/source/ti/driverlib/dl_wwdt.h \
  C:/APPLICATION/ti_SDK/mspm0_sdk_2_04_00_06/source/ti/driverlib/m0p/dl_interrupt.h \
  C:/APPLICATION/ti_SDK/mspm0_sdk_2_04_00_06/source/ti/driverlib/m0p/dl_systick.h \
- ../MSPM0/interrupt.h ../MSPM0/clock.h \
- C:/Users/Xe-131/workspace_ccstheia/empty_LP_MSPM0G3507_nortos_ticlang/motor/motor.h \
- C:/Users/Xe-131/workspace_ccstheia/empty_LP_MSPM0G3507_nortos_ticlang/motor/pid.h \
- C:/Users/Xe-131/workspace_ccstheia/empty_LP_MSPM0G3507_nortos_ticlang/user/user.h \
- C:/Users/Xe-131/workspace_ccstheia/empty_LP_MSPM0G3507_nortos_ticlang/MPU6050/mpu6050.h
+ C:/Users/Xe-131/workspace_ccstheia/empty_LP_MSPM0G3507_nortos_ticlang/MSPM0/clock.h \
+ ../MPU6050/mspm0_i2c.h
 ti_msp_dl_config.h:
 C:/APPLICATION/ti_SDK/mspm0_sdk_2_04_00_06/source/ti/devices/msp/msp.h:
 C:/APPLICATION/ti_SDK/mspm0_sdk_2_04_00_06/source/ti/devices/DeviceFamily.h:
@@ -154,9 +151,5 @@ C:/APPLICATION/ti_SDK/mspm0_sdk_2_04_00_06/source/ti/driverlib/dl_vref.h:
 C:/APPLICATION/ti_SDK/mspm0_sdk_2_04_00_06/source/ti/driverlib/dl_wwdt.h:
 C:/APPLICATION/ti_SDK/mspm0_sdk_2_04_00_06/source/ti/driverlib/m0p/dl_interrupt.h:
 C:/APPLICATION/ti_SDK/mspm0_sdk_2_04_00_06/source/ti/driverlib/m0p/dl_systick.h:
-../MSPM0/interrupt.h:
-../MSPM0/clock.h:
-C:/Users/Xe-131/workspace_ccstheia/empty_LP_MSPM0G3507_nortos_ticlang/motor/motor.h:
-C:/Users/Xe-131/workspace_ccstheia/empty_LP_MSPM0G3507_nortos_ticlang/motor/pid.h:
-C:/Users/Xe-131/workspace_ccstheia/empty_LP_MSPM0G3507_nortos_ticlang/user/user.h:
-C:/Users/Xe-131/workspace_ccstheia/empty_LP_MSPM0G3507_nortos_ticlang/MPU6050/mpu6050.h:
+C:/Users/Xe-131/workspace_ccstheia/empty_LP_MSPM0G3507_nortos_ticlang/MSPM0/clock.h:
+../MPU6050/mspm0_i2c.h:

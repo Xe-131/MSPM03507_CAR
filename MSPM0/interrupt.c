@@ -4,7 +4,7 @@
 #include "motor.h"
 #include "pid.h"
 #include "user.h"
-// #include "mpu6050.h"
+#include "mpu6050.h"
 
 // 关于PID 的速度全局变量定义在main.c 中
 extern int encode_cnt_left;
@@ -24,31 +24,37 @@ void SysTick_Handler(void)
 
 void GROUP1_IRQHandler(void)
 {
-    switch (DL_Interrupt_getPendingGroup(DL_INTERRUPT_GROUP_1)) {
-        // 编码器left 中断
-        case GPIO_MULTIPLE_GPIOB_INT_IIDX:
-            if (!DL_GPIO_readPins(GPIO_ENCODER_LEFT_PIN_EB_LEFT_PORT, GPIO_ENCODER_LEFT_PIN_EB_LEFT_PIN)) {
-                encode_cnt_left++;   
-            }
-            else {
-                encode_cnt_left--; 
-            }
-            break;
-        // 编码器right 中断
-        case GPIO_ENCODER_RIGHT_INT_IIDX:
-            if (!DL_GPIO_readPins(GPIO_ENCODER_RIGHT_PIN_EB_RIGHT_PORT, GPIO_ENCODER_RIGHT_PIN_EB_RIGHT_PIN)) {
-                encode_cnt_right--;   
-            }
-            else {
-                encode_cnt_right++;   
-            }
-            break;
-        // // MPU6050 中断
-        // case GPIO_MPU6050_PIN_INT_IIDX:
-        //     UART_sendString("s");
-        //     Read_Quad();
-        //     break;
+    uint32_t gpioA  = DL_GPIO_getEnabledInterruptStatus(GPIOA, GPIO_ENCODER_RIGHT_PIN_EA_RIGHT_PIN);
+    uint32_t gpioB  = DL_GPIO_getEnabledInterruptStatus(GPIOB, GPIO_ENCODER_LEFT_PIN_EA_LEFT_PIN | GPIO_MPU6050_PIN_INT_PIN);
+
+    // 编码器right 中断
+    if(gpioA & GPIO_ENCODER_RIGHT_PIN_EA_RIGHT_PIN){
+        if (!DL_GPIO_readPins(GPIO_ENCODER_RIGHT_PIN_EB_RIGHT_PORT, GPIO_ENCODER_RIGHT_PIN_EB_RIGHT_PIN)) {
+            encode_cnt_right--;   
+        }
+        else {
+            encode_cnt_right++;   
+        }
+        DL_GPIO_clearInterruptStatus(GPIOA, GPIO_ENCODER_RIGHT_PIN_EA_RIGHT_PIN);
     }
+
+    // 编码器left 中断
+    if(gpioB & GPIO_ENCODER_LEFT_PIN_EA_LEFT_PIN){
+        if (!DL_GPIO_readPins(GPIO_ENCODER_LEFT_PIN_EB_LEFT_PORT, GPIO_ENCODER_LEFT_PIN_EB_LEFT_PIN)) {
+            encode_cnt_left++;   
+        }
+        else {
+            encode_cnt_left--; 
+        }
+        DL_GPIO_clearInterruptStatus(GPIOB, GPIO_ENCODER_LEFT_PIN_EA_LEFT_PIN);
+    }
+
+    // MPU6050 中断
+    if(gpioB & GPIO_MPU6050_PIN_INT_PIN){
+        Read_Quad();
+        DL_GPIO_clearInterruptStatus(GPIOB, GPIO_MPU6050_PIN_INT_PIN);
+    }
+
 }
 
 // TIMA1
@@ -74,7 +80,7 @@ void TIMER_PID_INST_IRQHandler(void){
                 Set_Duty(LEFT, (int8_t)pid_calculate(&pid_motor_left, now_speed_left, target_speed_left));
                 Set_Duty(RIGHT, (int8_t)pid_calculate(&pid_motor_right, now_speed_right, target_speed_right));
                 // 绘图
-                // datavision_send(now_speed_left, target_speed_left, now_speed_right, target_speed_right);
+                datavision_send(now_speed_left, target_speed_left, now_speed_right, target_speed_right);
 
                 // char buffer[64];   // 足够大，避免溢出
                 // // 将 int 数据插入到字符串中

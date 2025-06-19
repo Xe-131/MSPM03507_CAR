@@ -125,6 +125,7 @@ GEN_OPTS__QUOTED :=
 # Every subdirectory with source files must be described here
 SUBDIRS := \
 . \
+MPU6050 \
 MSPM0 \
 OLED_Hardware_I2C \
 motor \

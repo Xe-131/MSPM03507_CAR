@@ -4,7 +4,7 @@
 #include "user.h"
 #include "oled_hardware_i2c.h"
 #include "clock.h"
-// #include "mpu6050.h"
+#include "mpu6050.h"
 
 // 编码器计数
 int encode_cnt_left     = 0;
@@ -13,8 +13,8 @@ int encode_cnt_right    = 0;
 float now_speed_left    = 0;
 float now_speed_right   = 0;
 // 目标速度
-float target_speed_left     = 500;
-float target_speed_right    = 500;
+float target_speed_left     = -250;
+float target_speed_right    = 250;
 
 int main(void){
     SYSCFG_DL_init();
@@ -29,13 +29,13 @@ int main(void){
     // OLED
     OLED_Init();
     OLED_ShowString(0,4,(uint8_t *)"  Yaw",16);
-    // uint8_t oled_buffer[32];
+    uint8_t oled_buffer[32];
     // MPU6050
-    // MPU6050_Init();
+    MPU6050_Init();
 
     // PID
-    pid_init(&pid_motor_left, DELTA_PID, 0.115, 0.01, 0.01);
-    pid_init(&pid_motor_right, DELTA_PID, 0.115, 0.01, 0.01);
+    pid_init(&pid_motor_left, DELTA_PID, 0.1, 0.01, 0.01);
+    pid_init(&pid_motor_right, DELTA_PID, 0.1, 0.01, 0.01);
 
     delay_cycles(CPUCLK_FREQ);
     Set_Duty(RIGHT, 0);
@@ -43,11 +43,7 @@ int main(void){
     Motor_On();
 
 
-    delay_cycles(CPUCLK_FREQ);
-    delay_cycles(CPUCLK_FREQ);
-    delay_cycles(CPUCLK_FREQ);
-    delay_cycles(CPUCLK_FREQ);
-    Motor_Off();
+
     while (1) {
        
 
@@ -56,9 +52,9 @@ int main(void){
             Motor_Off();
         }  
 
-        // // 显示YAW 角
-        // sprintf((char *)oled_buffer, "%-6.1f", yaw);
-        // OLED_ShowString(5*8,4,oled_buffer,16);
+        // 显示YAW 角
+        sprintf((char *)oled_buffer, "%-6.1f", yaw);
+        OLED_ShowString(5*8,4,oled_buffer,16);
     }
 }
 
