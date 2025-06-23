@@ -8,6 +8,6 @@
 
 void Motor_On(void);
 void Motor_Off(void);
-void Set_Duty(uint8_t side, int8_t duty);
+void Set_Duty(uint8_t side, float duty);
 
 #endif

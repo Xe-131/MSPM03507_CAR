@@ -15,10 +15,19 @@ void Motor_Off(void)
 }
 
 // duty: -100 到 100
-void Set_Duty(uint8_t side, int8_t duty)
+void Set_Duty(uint8_t side, float duty)
 {
     uint32_t compareValue   = 0;
     uint32_t loadvalue      = 4000 - 1;
+
+    // 限制duty 范围
+    if(duty < -100){
+        duty    = -100;
+    }
+    else if(duty > 100){
+        duty    = 100;
+    }
+
     if(side == LEFT){
         if((duty <= 0) && (duty >= -100))
         {

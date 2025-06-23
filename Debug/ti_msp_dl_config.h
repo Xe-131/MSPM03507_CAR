@@ -103,6 +103,16 @@ extern "C" {
 #define TIMER_PID_INST_IRQHandler                               TIMA1_IRQHandler
 #define TIMER_PID_INST_INT_IRQN                                 (TIMA1_INT_IRQn)
 #define TIMER_PID_INST_LOAD_VALUE                                          (49U)
+/* Defines for TIMER_INTOWHILE */
+#define TIMER_INTOWHILE_INST                                             (TIMG0)
+#define TIMER_INTOWHILE_INST_IRQHandler                         TIMG0_IRQHandler
+#define TIMER_INTOWHILE_INST_INT_IRQN                           (TIMG0_INT_IRQn)
+#define TIMER_INTOWHILE_INST_LOAD_VALUE                                  (1997U)
+/* Defines for TIMER_GENERAL */
+#define TIMER_GENERAL_INST                                               (TIMG6)
+#define TIMER_GENERAL_INST_IRQHandler                           TIMG6_IRQHandler
+#define TIMER_GENERAL_INST_INT_IRQN                             (TIMG6_INT_IRQn)
+#define TIMER_GENERAL_INST_LOAD_VALUE                                    (1997U)
 
 
 
@@ -161,16 +171,17 @@ extern "C" {
 #define GPIO_SWICH_PORT                                                  (GPIOB)
 
 /* Defines for PIN_S2: GPIOB.21 with pinCMx 49 on package pin 20 */
+// groups represented: ["GPIO_MPU6050","GPIO_ENCODER_LEFT","GPIO_SWICH"]
+// pins affected: ["PIN_INT","PIN_EA_LEFT","PIN_S2"]
+#define GPIO_MULTIPLE_GPIOB_INT_IRQN                            (GPIOB_INT_IRQn)
+#define GPIO_MULTIPLE_GPIOB_INT_IIDX            (DL_INTERRUPT_GROUP1_IIDX_GPIOB)
+#define GPIO_SWICH_PIN_S2_IIDX                              (DL_GPIO_IIDX_DIO21)
 #define GPIO_SWICH_PIN_S2_PIN                                   (DL_GPIO_PIN_21)
 #define GPIO_SWICH_PIN_S2_IOMUX                                  (IOMUX_PINCM49)
 /* Port definition for Pin Group GPIO_MPU6050 */
 #define GPIO_MPU6050_PORT                                                (GPIOB)
 
 /* Defines for PIN_INT: GPIOB.15 with pinCMx 32 on package pin 3 */
-// groups represented: ["GPIO_ENCODER_LEFT","GPIO_MPU6050"]
-// pins affected: ["PIN_EA_LEFT","PIN_INT"]
-#define GPIO_MULTIPLE_GPIOB_INT_IRQN                            (GPIOB_INT_IRQn)
-#define GPIO_MULTIPLE_GPIOB_INT_IIDX            (DL_INTERRUPT_GROUP1_IIDX_GPIOB)
 #define GPIO_MPU6050_PIN_INT_IIDX                           (DL_GPIO_IIDX_DIO15)
 #define GPIO_MPU6050_PIN_INT_PIN                                (DL_GPIO_PIN_15)
 #define GPIO_MPU6050_PIN_INT_IOMUX                               (IOMUX_PINCM32)
@@ -228,6 +239,8 @@ void SYSCFG_DL_GPIO_init(void);
 void SYSCFG_DL_SYSCTL_init(void);
 void SYSCFG_DL_PWM_MOTOR_init(void);
 void SYSCFG_DL_TIMER_PID_init(void);
+void SYSCFG_DL_TIMER_INTOWHILE_init(void);
+void SYSCFG_DL_TIMER_GENERAL_init(void);
 void SYSCFG_DL_I2C_MPU6050_init(void);
 void SYSCFG_DL_I2C_OLED_init(void);
 void SYSCFG_DL_UART_PC_init(void);

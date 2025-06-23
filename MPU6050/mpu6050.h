@@ -26,5 +26,7 @@ int Read_Quad(void);
 
 extern short gyro[3], accel[3];
 extern float pitch, roll, yaw;
+// 经过范围变化的yaw
+extern float angle;
 
 #endif  /* #ifndef _MPU6050_H_ */

@@ -75,7 +75,10 @@ motor/pid.o: ../motor/pid.c ../motor/pid.h \
  C:/APPLICATION/ti_SDK/mspm0_sdk_2_04_00_06/source/ti/driverlib/dl_wwdt.h \
  C:/APPLICATION/ti_SDK/mspm0_sdk_2_04_00_06/source/ti/driverlib/m0p/dl_interrupt.h \
  C:/APPLICATION/ti_SDK/mspm0_sdk_2_04_00_06/source/ti/driverlib/m0p/dl_systick.h \
- ../motor/motor.h
+ ../motor/motor.h \
+ C:/Users/Xe-131/workspace_ccstheia/empty_LP_MSPM0G3507_nortos_ticlang/MSPM0/interrupt.h \
+ C:/Users/Xe-131/workspace_ccstheia/empty_LP_MSPM0G3507_nortos_ticlang/MPU6050/mpu6050.h \
+ C:/Users/Xe-131/workspace_ccstheia/empty_LP_MSPM0G3507_nortos_ticlang/user/user.h
 ../motor/pid.h:
 ti_msp_dl_config.h:
 C:/APPLICATION/ti_SDK/mspm0_sdk_2_04_00_06/source/ti/devices/msp/msp.h:
@@ -152,3 +155,6 @@ C:/APPLICATION/ti_SDK/mspm0_sdk_2_04_00_06/source/ti/driverlib/dl_wwdt.h:
 C:/APPLICATION/ti_SDK/mspm0_sdk_2_04_00_06/source/ti/driverlib/m0p/dl_interrupt.h:
 C:/APPLICATION/ti_SDK/mspm0_sdk_2_04_00_06/source/ti/driverlib/m0p/dl_systick.h:
 ../motor/motor.h:
+C:/Users/Xe-131/workspace_ccstheia/empty_LP_MSPM0G3507_nortos_ticlang/MSPM0/interrupt.h:
+C:/Users/Xe-131/workspace_ccstheia/empty_LP_MSPM0G3507_nortos_ticlang/MPU6050/mpu6050.h:
+C:/Users/Xe-131/workspace_ccstheia/empty_LP_MSPM0G3507_nortos_ticlang/user/user.h:

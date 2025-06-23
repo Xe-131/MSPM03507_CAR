@@ -51,6 +51,8 @@ long quat[4];
 
 #define q30  (1073741824.0f) /* 2^30 = 1073741824 */
 float pitch, roll, yaw;
+// 经过范围变化的yaw
+float angle;
 
 /* The sensors can be mounted onto the board in any orientation. The mounting
  * matrix seen below tells the MPL how to rotate the raw data from thei
@@ -232,6 +234,7 @@ int Read_Quad(void)
     pitch  = asin(-2 * q1 * q3 + 2 * q0 * q2) * 57.3;
     roll   = atan2(2 * q2 * q3 + 2 * q0 * q1, -2 * q1 * q1 - 2 * q2 * q2 + 1) * 57.3;
     yaw    = atan2(2 * (q1 * q2 + q0 * q3), q0 * q0 + q1 * q1 - q2 * q2 - q3 * q3) * 57.3;
+    angle  = fmod((yaw + 360), 360);
 
     return 0;
 }

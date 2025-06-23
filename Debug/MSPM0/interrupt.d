@@ -76,7 +76,6 @@ MSPM0/interrupt.o: ../MSPM0/interrupt.c \
  C:/APPLICATION/ti_SDK/mspm0_sdk_2_04_00_06/source/ti/driverlib/m0p/dl_interrupt.h \
  C:/APPLICATION/ti_SDK/mspm0_sdk_2_04_00_06/source/ti/driverlib/m0p/dl_systick.h \
  ../MSPM0/interrupt.h ../MSPM0/clock.h \
- C:/Users/Xe-131/workspace_ccstheia/empty_LP_MSPM0G3507_nortos_ticlang/motor/motor.h \
  C:/Users/Xe-131/workspace_ccstheia/empty_LP_MSPM0G3507_nortos_ticlang/motor/pid.h \
  C:/Users/Xe-131/workspace_ccstheia/empty_LP_MSPM0G3507_nortos_ticlang/user/user.h \
  C:/Users/Xe-131/workspace_ccstheia/empty_LP_MSPM0G3507_nortos_ticlang/MPU6050/mpu6050.h
@@ -156,7 +155,6 @@ C:/APPLICATION/ti_SDK/mspm0_sdk_2_04_00_06/source/ti/driverlib/m0p/dl_interrupt.
 C:/APPLICATION/ti_SDK/mspm0_sdk_2_04_00_06/source/ti/driverlib/m0p/dl_systick.h:
 ../MSPM0/interrupt.h:
 ../MSPM0/clock.h:
-C:/Users/Xe-131/workspace_ccstheia/empty_LP_MSPM0G3507_nortos_ticlang/motor/motor.h:
 C:/Users/Xe-131/workspace_ccstheia/empty_LP_MSPM0G3507_nortos_ticlang/motor/pid.h:
 C:/Users/Xe-131/workspace_ccstheia/empty_LP_MSPM0G3507_nortos_ticlang/user/user.h:
 C:/Users/Xe-131/workspace_ccstheia/empty_LP_MSPM0G3507_nortos_ticlang/MPU6050/mpu6050.h:

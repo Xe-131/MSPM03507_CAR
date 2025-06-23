@@ -80,7 +80,8 @@ user/main.o: ../user/main.c \
  ../user/user.h \
  C:/Users/Xe-131/workspace_ccstheia/empty_LP_MSPM0G3507_nortos_ticlang/OLED_Hardware_I2C/oled_hardware_i2c.h \
  C:/Users/Xe-131/workspace_ccstheia/empty_LP_MSPM0G3507_nortos_ticlang/MSPM0/clock.h \
- C:/Users/Xe-131/workspace_ccstheia/empty_LP_MSPM0G3507_nortos_ticlang/MPU6050/mpu6050.h
+ C:/Users/Xe-131/workspace_ccstheia/empty_LP_MSPM0G3507_nortos_ticlang/MPU6050/mpu6050.h \
+ C:/Users/Xe-131/workspace_ccstheia/empty_LP_MSPM0G3507_nortos_ticlang/MSPM0/interrupt.h
 ti_msp_dl_config.h:
 C:/APPLICATION/ti_SDK/mspm0_sdk_2_04_00_06/source/ti/devices/msp/msp.h:
 C:/APPLICATION/ti_SDK/mspm0_sdk_2_04_00_06/source/ti/devices/DeviceFamily.h:
@@ -161,3 +162,4 @@ C:/Users/Xe-131/workspace_ccstheia/empty_LP_MSPM0G3507_nortos_ticlang/motor/pid.
 C:/Users/Xe-131/workspace_ccstheia/empty_LP_MSPM0G3507_nortos_ticlang/OLED_Hardware_I2C/oled_hardware_i2c.h:
 C:/Users/Xe-131/workspace_ccstheia/empty_LP_MSPM0G3507_nortos_ticlang/MSPM0/clock.h:
 C:/Users/Xe-131/workspace_ccstheia/empty_LP_MSPM0G3507_nortos_ticlang/MPU6050/mpu6050.h:
+C:/Users/Xe-131/workspace_ccstheia/empty_LP_MSPM0G3507_nortos_ticlang/MSPM0/interrupt.h:

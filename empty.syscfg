@@ -23,6 +23,8 @@ const PWM1   = PWM.addInstance();
 const SYSCTL = scripting.addModule("/ti/driverlib/SYSCTL");
 const TIMER  = scripting.addModule("/ti/driverlib/TIMER", {}, false);
 const TIMER1 = TIMER.addInstance();
+const TIMER2 = TIMER.addInstance();
+const TIMER3 = TIMER.addInstance();
 const UART   = scripting.addModule("/ti/driverlib/UART", {}, false);
 const UART1  = UART.addInstance();
 
@@ -71,6 +73,9 @@ GPIO2.$name                               = "GPIO_SWICH";
 GPIO2.associatedPins[0].$name             = "PIN_S2";
 GPIO2.associatedPins[0].direction         = "INPUT";
 GPIO2.associatedPins[0].launchPadShortcut = "Button3En";
+GPIO2.associatedPins[0].interruptEn       = true;
+GPIO2.associatedPins[0].polarity          = "FALL";
+GPIO2.associatedPins[0].pin.$assign       = "PB21";
 
 GPIO3.$name                              = "GPIO_ENCODER_LEFT";
 GPIO3.associatedPins.create(2);
@@ -163,11 +168,28 @@ TIMER1.$name              = "TIMER_PID";
 TIMER1.timerClkSrc        = "LFCLK";
 TIMER1.timerMode          = "PERIODIC";
 TIMER1.timerPeriod        = "500 ms";
-TIMER1.timerStartTimer    = true;
 TIMER1.interrupts         = ["ZERO"];
 TIMER1.timerClkDiv        = 8;
 TIMER1.timerClkPrescale   = 41;
 TIMER1.peripheral.$assign = "TIMA1";
+
+TIMER2.timerClkSrc        = "LFCLK";
+TIMER2.timerMode          = "PERIODIC";
+TIMER2.interrupts         = ["ZERO"];
+TIMER2.timerClkDiv        = 8;
+TIMER2.timerClkPrescale   = 41;
+TIMER2.$name              = "TIMER_INTOWHILE";
+TIMER2.timerPeriod        = "20s";
+TIMER2.peripheral.$assign = "TIMG0";
+
+TIMER3.timerClkSrc        = "LFCLK";
+TIMER3.timerMode          = "PERIODIC";
+TIMER3.interrupts         = ["ZERO"];
+TIMER3.timerClkDiv        = 8;
+TIMER3.timerClkPrescale   = 41;
+TIMER3.timerPeriod        = "20s";
+TIMER3.$name              = "TIMER_GENERAL";
+TIMER3.peripheral.$assign = "TIMG6";
 
 UART1.$name                            = "UART_PC";
 UART1.targetBaudRate                   = 115200;
@@ -188,8 +210,7 @@ UART1.rxPinConfig.$name                = "ti_driverlib_gpio_GPIOPinGeneric3";
  * version of the tool will not impact the pinmux you originally saw.  These lines can be completely deleted in order to
  * re-solve from scratch.
  */
-Board.peripheral.$suggestSolution            = "DEBUGSS";
-Board.peripheral.swclkPin.$suggestSolution   = "PA20";
-Board.peripheral.swdioPin.$suggestSolution   = "PA19";
-GPIO2.associatedPins[0].pin.$suggestSolution = "PB21";
-UART1.peripheral.$suggestSolution            = "UART0";
+Board.peripheral.$suggestSolution          = "DEBUGSS";
+Board.peripheral.swclkPin.$suggestSolution = "PA20";
+Board.peripheral.swdioPin.$suggestSolution = "PA19";
+UART1.peripheral.$suggestSolution          = "UART0";
