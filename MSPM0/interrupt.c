@@ -9,7 +9,6 @@
 void SysTick_Handler(void)
 {
     tick_ms++;
-
 }
 
 // S2 
@@ -57,7 +56,7 @@ void GROUP1_IRQHandler(void)
 
 // TIMA1
 // 定时清空编码器计数器，并计算实时速度
-uint8_t PID_flag = 0;
+uint8_t pid_timer_flag = 0;
 void TIMER_PID_INST_IRQHandler(void){
     switch (DL_TimerG_getPendingInterrupt(TIMER_PID_INST)) {
         // 清零中断位
@@ -67,7 +66,7 @@ void TIMER_PID_INST_IRQHandler(void){
                 DL_Timer_setLoadValue(TIMER_PID_INST, TIMER_PID_PERIOD / 10.0);
                 DL_TimerG_startCounter(TIMER_PID_INST);
 
-                PID_flag    = 1;
+                pid_timer_flag    = 1;
             break;
         default:
             break;

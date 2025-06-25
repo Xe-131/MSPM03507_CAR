@@ -1,8 +1,10 @@
 #include "motor.h"
+uint8_t motor_on_flag   = 0;
 
 // standby
 void Motor_On(void)
 {
+    motor_on_flag   = 1;
     DL_GPIO_setPins(GPIO_MOTOR_PIN_LEFT_STSNDBY_PORT, GPIO_MOTOR_PIN_LEFT_STSNDBY_PIN);
     DL_GPIO_setPins(GPIO_MOTOR_PIN_RIGHT_STSNDBY_PORT, GPIO_MOTOR_PIN_RIGHT_STSNDBY_PIN);
 }
@@ -10,6 +12,7 @@ void Motor_On(void)
 // standby
 void Motor_Off(void)
 {
+    motor_on_flag   = 0;
     DL_GPIO_clearPins(GPIO_MOTOR_PIN_LEFT_STSNDBY_PORT, GPIO_MOTOR_PIN_LEFT_STSNDBY_PIN);
     DL_GPIO_clearPins(GPIO_MOTOR_PIN_RIGHT_STSNDBY_PORT, GPIO_MOTOR_PIN_RIGHT_STSNDBY_PIN);
 }
