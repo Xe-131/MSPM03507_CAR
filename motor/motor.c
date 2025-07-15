@@ -1,7 +1,14 @@
 #include "motor.h"
+
+// 所有电机的standby 是否关闭
 uint8_t motor_on_flag   = 0;
 
-// standby
+/**
+ * @brief   关闭所有电机的standby
+ * @param   无
+ * @param   无
+ * @return  无
+ */
 void Motor_On(void)
 {
     motor_on_flag   = 1;
@@ -9,7 +16,12 @@ void Motor_On(void)
     DL_GPIO_setPins(GPIO_MOTOR_PIN_RIGHT_STSNDBY_PORT, GPIO_MOTOR_PIN_RIGHT_STSNDBY_PIN);
 }
 
-// standby
+/**
+ * @brief   打开所有电机的standby
+ * @param   无
+ * @param   无
+ * @return  无
+ */
 void Motor_Off(void)
 {
     motor_on_flag   = 0;
@@ -17,7 +29,14 @@ void Motor_Off(void)
     DL_GPIO_clearPins(GPIO_MOTOR_PIN_RIGHT_STSNDBY_PORT, GPIO_MOTOR_PIN_RIGHT_STSNDBY_PIN);
 }
 
-// duty: -100 到 100
+
+/**
+ * @brief 为单侧轮子设置PWM duty
+ * @param side 宏
+ * @param duty 范围在-100 到 100，为float 类型
+ * @return 无
+ * @note 超过范围的duty 取-100或者100
+ */
 void Set_Duty(uint8_t side, float duty)
 {
     uint32_t compareValue   = 0;
