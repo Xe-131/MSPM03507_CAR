@@ -36,6 +36,8 @@
                                 <option id="com.ti.ccstudio.buildDefinitions.TMS470_TICLANG_4.0.compilerID.INCLUDE_PATH.531142085" superClass="com.ti.ccstudio.buildDefinitions.TMS470_TICLANG_4.0.compilerID.INCLUDE_PATH" valueType="includePath">
                                     <listOptionValue value="${COM_TI_MSPM0_SDK_INCLUDE_PATH}"/>
                                     <listOptionValue value="${SYSCONFIG_TOOL_INCLUDE_PATH}"/>
+                                    <listOptionValue value="${PROJECT_ROOT}/position/mavlink/common"/>
+                                    <listOptionValue value="${PROJECT_ROOT}/position"/>
                                     <listOptionValue value="${PROJECT_ROOT}/user"/>
                                     <listOptionValue value="${PROJECT_ROOT}/motor"/>
                                     <listOptionValue value="${PROJECT_ROOT}"/>

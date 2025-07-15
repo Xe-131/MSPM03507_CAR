@@ -105,6 +105,32 @@ void TIMER_GENERAL_INST_IRQHandler(void){
     }
 }
 
+// UART_MAVLINK 接收中断
+// 读取缓冲区
+// #define UART_RX_BUFFER_SIZE 30 定义在头文件中
+uint8_t uart_rx_buffer[UART_RX_BUFFER_SIZE];
+uint16_t uart_rx_head = 0;
+uint16_t uart_rx_tail = 0;
+void UART_MAVLINK_INST_IRQHandler(void)
+{
+    switch (DL_UART_Main_getPendingInterrupt(UART_MAVLINK_INST)) {
+        case DL_UART_MAIN_IIDX_RX:
+        {
+            uint8_t data        = DL_UART_Main_receiveData(UART_MAVLINK_INST);
+            uint16_t next_head  = (uart_rx_head + 1) % UART_RX_BUFFER_SIZE;
+
+            // 缓冲区未满
+            if (next_head != uart_rx_tail) {
+                uart_rx_buffer[uart_rx_head] = data;
+                uart_rx_head = next_head;
+            }
+            // 否则缓冲区满，丢弃数据
+            break;
+        }
+        default:
+            break;
+    }
+}
 
 
 
@@ -173,10 +199,6 @@ void SPI1_IRQHandler(void)
     __BKPT();
 }
 
-void UART1_IRQHandler(void)
-{
-    __BKPT();
-}
 
 void UART2_IRQHandler(void)
 {

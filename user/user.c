@@ -21,3 +21,23 @@ void UART_sendString(char *str)
         str++;  // 下一个字符
     }
 }
+
+// 发送一个字节
+void UART_send(uint8_t byte){
+    while (DL_UART_isTXFIFOFull(UART_PC_INST)) {
+    }
+    DL_UART_transmitData(UART_PC_INST, byte);   
+}
+
+// 通用
+void UART_send_byte(UART_Regs *uart, uint8_t data) {
+    while (DL_UART_isTXFIFOFull(uart)) {
+    }
+    DL_UART_transmitData(uart, data);   
+}
+
+void UART_send_buffer(UART_Regs *uart, uint8_t* buf, uint16_t len) {
+    for (uint16_t i = 0; i < len; i++) {
+        UART_send_byte(uart, buf[i]);
+    }
+}

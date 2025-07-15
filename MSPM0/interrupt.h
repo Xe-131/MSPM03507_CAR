@@ -12,4 +12,10 @@ extern uint8_t general_timer_flag;
 // S2 
 extern uint8_t S2_flag;
 
+// mavlink 串口接收缓冲区
+#define UART_RX_BUFFER_SIZE 30
+extern uint8_t uart_rx_buffer[];
+extern uint16_t uart_rx_head;
+extern uint16_t uart_rx_tail;
+
 #endif  

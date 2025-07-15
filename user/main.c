@@ -5,6 +5,8 @@
 #include "clock.h"
 #include "mpu6050.h"
 #include "interrupt.h"
+#include "uwb.h"
+#include "mavlink.h"
 
 int main(void){
     uint8_t usart_buffer[200];
@@ -19,6 +21,9 @@ int main(void){
     NVIC_EnableIRQ(TIMER_INTOWHILE_INST_INT_IRQN);
     // TIMER_GENERAL 中断
     NVIC_EnableIRQ(TIMER_GENERAL_INST_INT_IRQN);
+    // UART_MAVLINK 中断
+    NVIC_ClearPendingIRQ(UART_MAVLINK_INST_INT_IRQN);
+    NVIC_EnableIRQ(UART_MAVLINK_INST_INT_IRQN);
 
     // systick
     SysTick_Init();
@@ -41,6 +46,15 @@ int main(void){
     set_target_angle(0);
     set_target_speed(0);
 
+    // mavlink 订阅UWB 位置信息
+    while (g_target_system_id == 0) {
+        // 解析心跳包
+        mavlink_decode_receive_message();
+    }
+    // 订阅【位置】数据流，请求频率为 1 Hz
+    // request_data_stream(g_target_system_id, 1, MAVLINK_MSG_ID_GLOBAL_VISION_POSITION_ESTIMATE, 1);
+    delay_cycles(CPUCLK_FREQ);
+    request_message_interval_v1_forced(1, MAVLINK_MSG_ID_GLOBAL_VISION_POSITION_ESTIMATE, 1);
     while (1) {
         // 调试
         // oled_display(usart_buffer);
@@ -51,6 +65,8 @@ int main(void){
         // sprintf(usart_buffer, "left duty: %f right duty: %f angleduty: %f target_angle: %f\r\n", pid_motor_left.out, pid_motor_right.out, pid_angle.out, target_angle);
         // UART_sendString(usart_buffer);	
 
+        // UWB 解析坐标
+        mavlink_decode_receive_message();
         // 开关电机
         if(S2_flag == 1){
             S2_flag = 0;
@@ -98,7 +114,7 @@ int main(void){
             //     target_angle -= 360;
             // }        
         }
-
+        
     }
 }
 
