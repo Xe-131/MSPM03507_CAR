@@ -21,6 +21,9 @@ int main(void){
     NVIC_EnableIRQ(TIMER_INTOWHILE_INST_INT_IRQN);
     // TIMER_GENERAL 中断
     NVIC_EnableIRQ(TIMER_GENERAL_INST_INT_IRQN);
+    // TIMER_GENERAL 开始计时
+    DL_Timer_setLoadValue(TIMER_GENERAL_INST, TIMER_GENERAL_PERIOD / 10.0);
+    DL_Timer_startCounter(TIMER_GENERAL_INST);
     // UART_MAVLINK 中断
     NVIC_ClearPendingIRQ(UART_MAVLINK_INST_INT_IRQN);
     NVIC_EnableIRQ(UART_MAVLINK_INST_INT_IRQN);
@@ -46,15 +49,6 @@ int main(void){
     set_target_angle(0);
     set_target_speed(0);
 
-    // mavlink 订阅UWB 位置信息
-    while (g_target_system_id == 0) {
-        // 解析心跳包
-        mavlink_decode_receive_message();
-    }
-    // 订阅【位置】数据流，请求频率为 1 Hz
-    // request_data_stream(g_target_system_id, 1, MAVLINK_MSG_ID_GLOBAL_VISION_POSITION_ESTIMATE, 1);
-    delay_cycles(CPUCLK_FREQ);
-    request_message_interval_v1_forced(1, MAVLINK_MSG_ID_GLOBAL_VISION_POSITION_ESTIMATE, 1);
     while (1) {
         // 调试
         // oled_display(usart_buffer);
@@ -89,10 +83,6 @@ int main(void){
             reset_pid(&pid_angle);
             Motor_On();
 
-            // TIMER_GENERAL
-            DL_Timer_setLoadValue(TIMER_GENERAL_INST, TIMER_GENERAL_PERIOD / 10.0);
-            DL_Timer_startCounter(TIMER_GENERAL_INST);
-
             // TIMER_PID 
             DL_Timer_setLoadValue(TIMER_PID_INST, TIMER_PID_PERIOD / 10.0);
             DL_TimerG_startCounter(TIMER_PID_INST);
@@ -108,11 +98,7 @@ int main(void){
         // 通用定时
         if(general_timer_flag == 1){
             general_timer_flag    = 0;
-
-            // target_angle += 180;
-            // if(target_angle >= 360){
-            //     target_angle -= 360;
-            // }        
+   
         }
         
     }
