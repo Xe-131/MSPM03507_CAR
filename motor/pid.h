@@ -51,6 +51,7 @@ typedef struct
 extern pid_t pid_motor_left;
 extern pid_t pid_motor_right;
 extern pid_t pid_angle;
+extern pid_t pid_distance;
 
 void pid_init(pid_t *pid, uint32_t pid_mode, float p, float i, float d);
 float pid_calculate(pid_t *pid, float now, float target);

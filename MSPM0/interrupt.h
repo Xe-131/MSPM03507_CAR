@@ -3,8 +3,8 @@
 
 // ms
 # define TIMER_PID_PERIOD 100
-# define TIMER_INTOWHILE_PERIOD 15000
-# define TIMER_GENERAL_PERIOD 1000
+# define TIMER_INTOWHILE_PERIOD 20000
+# define TIMER_GENERAL_PERIOD 500
 
 extern uint8_t into_wihle_flag;
 extern uint8_t pid_timer_flag;

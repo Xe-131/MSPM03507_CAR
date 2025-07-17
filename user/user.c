@@ -1,43 +1,39 @@
 #include "user.h"
+#include "string.h"
 
-// 纸飞机绘图用
-void datavision_send(float now_speed_left, float target_speed_left, float now_speed_right, float target_speed_right){
-    char buffer[64];  // 足够大，避免溢出
-
-    // 将 int 数据插入到字符串中
-    sprintf(buffer, "{plotter:%f,%f,%f,%f}\r\n", now_speed_left, target_speed_left, now_speed_right, target_speed_right);
-
-    // 发送拼接好的字符串
-    UART_sendString(buffer);
-}
-
-// 发送字符串
-void UART_sendString(char *str)
-{
-    while (*str) {
-        while (DL_UART_isTXFIFOFull(UART_PC_INST)) {
-        }
-        DL_UART_transmitData(UART_PC_INST, (uint8_t)(*str));
-        str++;  // 下一个字符
-    }
-}
-
-// 发送一个字节
-void UART_send(uint8_t byte){
-    while (DL_UART_isTXFIFOFull(UART_PC_INST)) {
-    }
-    DL_UART_transmitData(UART_PC_INST, byte);   
-}
-
-// 通用
+// 通用------------------------------
 void UART_send_byte(UART_Regs *uart, uint8_t data) {
     while (DL_UART_isTXFIFOFull(uart)) {
     }
     DL_UART_transmitData(uart, data);   
 }
 
+// 只打印buf 里面的有效值，不会新加空格
 void UART_send_buffer(UART_Regs *uart, uint8_t* buf, uint16_t len) {
     for (uint16_t i = 0; i < len; i++) {
         UART_send_byte(uart, buf[i]);
+    }
+}
+
+void UART_send_int(UART_Regs *uart, int value) {
+    char buffer[16];  // 足够容纳 int 的字符串形式
+    snprintf(buffer, sizeof(buffer), "%d", value);  // 将整数转换为字符串
+    UART_send_buffer(uart, (uint8_t*)buffer, strlen(buffer));  // 发送字符串
+    UART_send_byte(uart, ' ');  // 添加一个空格
+}
+
+// 打印一个 float 类型数值（保留 2 位小数）
+void UART_send_float(UART_Regs *uart, float value) {
+    char buffer[32];  // 足够容纳 float 的字符串形式
+    snprintf(buffer, sizeof(buffer), "%.2f", value);  // 转换为字符串，保留两位小数
+    UART_send_buffer(uart, (uint8_t*)buffer, strlen(buffer));  // 通过串口发送
+    UART_send_byte(uart, ' ');  // 添加一个空格
+}
+
+// 发送字符串函数
+void UART_send_string(UART_Regs *uart, const char* str) {
+    while (*str != '\0') {
+        UART_send_byte(uart, (uint8_t)(*str));
+        str++;
     }
 }

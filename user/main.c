@@ -7,6 +7,7 @@
 #include "interrupt.h"
 #include "uwb.h"
 #include "mavlink.h"
+#include "position.h"
 
 int main(void){
     uint8_t usart_buffer[200];
@@ -45,9 +46,13 @@ int main(void){
     // PID
     pid_init(&pid_motor_left, DELTA_PID, 0.1, 0.005, 0.00);
     pid_init(&pid_motor_right, DELTA_PID, 0.1, 0.001, 0.00);
-    pid_init(&pid_angle, POSITION_PID, 20, 0.005, 0);
+    pid_init(&pid_angle, POSITION_PID, 40, 0.005, 0);
+    //
+    pid_init(&pid_distance, DELTA_PID, 0.1, 0.005, 0);
     set_target_angle(0);
     set_target_speed(0);
+
+
 
     while (1) {
         // 调试
@@ -86,6 +91,9 @@ int main(void){
             // TIMER_PID 
             DL_Timer_setLoadValue(TIMER_PID_INST, TIMER_PID_PERIOD / 10.0);
             DL_TimerG_startCounter(TIMER_PID_INST);
+
+            // 开启路径规划
+            set_target_point(150, -150);
         }
 
         // PID 计算
@@ -98,7 +106,8 @@ int main(void){
         // 通用定时
         if(general_timer_flag == 1){
             general_timer_flag    = 0;
-   
+            navigation_update();
+            
         }
         
     }

@@ -2,6 +2,7 @@
 #include "ti_msp_dl_config.h"
 #include "interrupt.h"
 #include "user.h"
+#include "position.h"
 
 /**
  * @brief 解析mavlink 串口存储在缓冲区的一个字节，在刚好解析完成一个包时可以选择触发某些操作
@@ -25,32 +26,34 @@ void mavlink_decode_receive_message(){
     // 处理读到的byte
     if (mavlink_parse_char(chan, byte, &msg, &status)){
         switch(msg.msgid) {
-            // heartbeat
-            case MAVLINK_MSG_ID_HEARTBEAT:
-            {
-                mavlink_heartbeat_t heartbeat;
-                mavlink_msg_heartbeat_decode(&msg, &heartbeat);
-                // 打印
-                UART_send(0xAA);
-                UART_send(heartbeat.autopilot);
-                UART_send(heartbeat.base_mode);
-                UART_send(heartbeat.custom_mode);
-                UART_send(heartbeat.system_status);
-                UART_send(heartbeat.mavlink_version);
-                UART_send(0xAA);
-            }
-            break;
+            // // heartbeat
+            // case MAVLINK_MSG_ID_HEARTBEAT:
+            // {
+            //     mavlink_heartbeat_t heartbeat;
+            //     mavlink_msg_heartbeat_decode(&msg, &heartbeat);
+            //     // 打印
+            //     UART_send(0xAA);
+            //     UART_send(heartbeat.autopilot);
+            //     UART_send(heartbeat.base_mode);
+            //     UART_send(heartbeat.custom_mode);
+            //     UART_send(heartbeat.system_status);
+            //     UART_send(heartbeat.mavlink_version);
+            //     UART_send(0xAA);
+            // }
+            // break;
             // UWB和陀螺仪
             case MAVLINK_MSG_ID_GLOBAL_VISION_POSITION_ESTIMATE:
             {
                 mavlink_global_vision_position_estimate_t uwb;
                 mavlink_msg_global_vision_position_estimate_decode(&msg, &uwb);
-                // 这里xyz 均为float 只是为了打印测试转化为uint8
-                UART_send(0xBB);
-                UART_send((uint8_t)uwb.x);
-                UART_send((uint8_t)uwb.y);
-                UART_send((uint8_t)uwb.z);
-                UART_send(0xBB);
+                
+                NOW_x   = uwb.x;
+                NOW_y   = uwb.y;
+                NOW_z   = uwb.z;               
+
+                UART_send_float(UART_BLUEUART_INST, NOW_x);
+                UART_send_float(UART_BLUEUART_INST, NOW_y);
+                UART_send_float(UART_BLUEUART_INST, NOW_z);
             }
             break;
             default:

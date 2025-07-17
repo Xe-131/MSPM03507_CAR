@@ -4,11 +4,11 @@
 #include "mpu6050.h"
 #include "user.h"
 
-// 定义三个PID 对象
+// PID 对象
 pid_t pid_motor_left;
 pid_t pid_motor_right;
 pid_t pid_angle;
-
+pid_t pid_distance;
 // 编码器计数
 int encode_cnt_left     = 0;
 int encode_cnt_right    = 0;
@@ -110,6 +110,14 @@ void pid_controal(void){
 
 	// 计算角度PID: 输入角度差，输出速度值
 	angle_pid_value         = pid_calculate(&pid_angle, now_angle, target_angle);
+	// 给角度PID 输出设置上限，但调高P 值
+	if(angle_pid_value >= 700){
+		angle_pid_value = 700;
+	}
+	else if(angle_pid_value <= -700){
+		angle_pid_value	= -700;
+	}
+
 	// 计算速度PID：输入速度差，输出duty 值, 并限幅
 	motor_pid_left_value    = limit_float(pid_calculate(&pid_motor_left, now_speed_left, target_speed_left - angle_pid_value), -100, 100);
 	motor_pid_right_value   = limit_float(pid_calculate(&pid_motor_right, now_speed_right, target_speed_right + angle_pid_value),-100, 100);

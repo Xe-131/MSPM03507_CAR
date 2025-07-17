@@ -81,15 +81,15 @@ void Set_Duty(uint8_t side, float duty)
             // PWM
             DL_TimerA_setCaptureCompareValue(PWM_MOTOR_INST, compareValue, DL_TIMER_CC_3_INDEX);
             // 方向
-            DL_GPIO_setPins(GPIO_MOTOR_PIN_RIGHT_DIRECT_1_PORT, GPIO_MOTOR_PIN_RIGHT_DIRECT_1_PIN);
-            DL_GPIO_clearPins(GPIO_MOTOR_PIN_RIGHT_DIRECT_2_PORT, GPIO_MOTOR_PIN_RIGHT_DIRECT_2_PIN);
+            DL_GPIO_clearPins(GPIO_MOTOR_PIN_RIGHT_DIRECT_1_PORT, GPIO_MOTOR_PIN_RIGHT_DIRECT_1_PIN);
+            DL_GPIO_setPins(GPIO_MOTOR_PIN_RIGHT_DIRECT_2_PORT, GPIO_MOTOR_PIN_RIGHT_DIRECT_2_PIN);
         }
         else if((duty >= 0) && (duty <= 100))
         {
             compareValue = loadvalue - loadvalue * (duty/100.0);
             DL_TimerA_setCaptureCompareValue(PWM_MOTOR_INST, compareValue, DL_TIMER_CC_3_INDEX);
-            DL_GPIO_clearPins(GPIO_MOTOR_PIN_RIGHT_DIRECT_1_PORT, GPIO_MOTOR_PIN_RIGHT_DIRECT_1_PIN);
-            DL_GPIO_setPins(GPIO_MOTOR_PIN_RIGHT_DIRECT_2_PORT, GPIO_MOTOR_PIN_RIGHT_DIRECT_2_PIN);
+            DL_GPIO_setPins(GPIO_MOTOR_PIN_RIGHT_DIRECT_1_PORT, GPIO_MOTOR_PIN_RIGHT_DIRECT_1_PIN);
+            DL_GPIO_clearPins(GPIO_MOTOR_PIN_RIGHT_DIRECT_2_PORT, GPIO_MOTOR_PIN_RIGHT_DIRECT_2_PIN);
 
         }
         // 非法duty --- 关闭电机 standby
