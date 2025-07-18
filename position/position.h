@@ -20,6 +20,15 @@ typedef enum {
     NAV_ARRIVED     // 已到达
 } NavigationState_t;
 
+// 导航状态
+extern NavigationState_t nav_state;
+
+// 定义一个二维坐标点结构体
+typedef struct {
+    float x;
+    float y;
+} Point_t;
+
 // 角度偏差范围 单位：度
 #define ANGLE_THRESHOLD 2
 // 距离偏差范围 单位：cm
@@ -32,6 +41,9 @@ typedef enum {
 // ---------- 公共接口函数 ----------
 void set_target_point(float x, float y);
 void navigation_update(void);
+void path_start(const Point_t path[], int num_points);
+void path_update(void);
+
 // ---------- 内部辅助函数 ----------
 static float normalize_angle(float angle);
 

@@ -18,6 +18,12 @@ float TARGET_z;
 // 导航状态
 NavigationState_t nav_state = NAV_IDLE;
 
+// 路径跟踪相关的静态全局变量
+static const Point_t* g_current_path    = NULL; // 指向当前路径点数组的指针
+static int g_total_path_points          = 0;          // 当前路径的总点数
+static int g_current_point_index        = 0;        // 当前目标点在路径中的索引
+static bool g_is_path_active            = false;        // 路径跟踪是否正在进行中
+
 // ---------- 公共接口函数 ----------
 
 /**
@@ -28,6 +34,14 @@ NavigationState_t nav_state = NAV_IDLE;
  * @return  
  * @note 
  */
+
+/**
+ * @brief 导航到点(x, y)
+ * @param x  
+ * @param y  
+ * @return 无
+ * @note 此函数需要配合函数navigation_update 使用
+ */
 void set_target_point(float x, float y){
     TARGET_x    = x;
     TARGET_y    = y;
@@ -35,12 +49,10 @@ void set_target_point(float x, float y){
 }
 
 /**
- * @brief   
- * @param   
- * @param   
- * @param   
- * @return  
- * @note 
+ * @brief 由set_target_point 函数使能。完成一个目标点的导航
+ * @param  无
+ * @return 无
+ * @note 需要定时调用此函数
  */
  void navigation_update(void) {
     // 角度稳定计数
@@ -57,20 +69,12 @@ void set_target_point(float x, float y){
     switch (nav_state) {
 
         case NAV_IDLE:
-        // 调试
-        UART_send_string(UART_BLUEUART_INST, "STATE:");
-        UART_send_int(UART_BLUEUART_INST, 11111);
-
             // 空闲状态，什么也不做，确保小车停止
             set_target_speed(0);
-            set_target_angle(now_angle);
+            set_target_angle(0);
             break;
 
         case NAV_ROTATING: {
-        // 调试
-        UART_send_string(UART_BLUEUART_INST, "STATE:");
-        UART_send_int(UART_BLUEUART_INST, 22222);    
-
             // --- 目标: 原地旋转对准目标点 ---
             
             // 1. 计算目标角度:这里注意坐标系，xy还是yx
@@ -105,10 +109,6 @@ void set_target_point(float x, float y){
         }
 
         case NAV_MOVING: {
-        // 调试
-        UART_send_string(UART_BLUEUART_INST, "STATE:");
-        UART_send_int(UART_BLUEUART_INST, 33333);
-
             // --- 目标: 朝着目标点前进，并实时修正方向 ---
             
             // 1. 检查是否已到达
@@ -134,14 +134,17 @@ void set_target_point(float x, float y){
             
             // 5. 设置目标速度
             set_target_speed(100);
+            if(distance_to_target >= 120){
+                set_target_speed(475);
+            }
+            else{
+                set_target_speed(50);
+            }
             
             break;
         }
 
         case NAV_ARRIVED:
-        // 调试
-        UART_send_string(UART_BLUEUART_INST, "STATE:");
-        UART_send_int(UART_BLUEUART_INST, 44444);
             // --- 目标: 停止小车 ---
             set_target_speed(0);
             // 可以在这里设置目标角度为当前角度，防止漂移
@@ -152,6 +155,83 @@ void set_target_point(float x, float y){
             break;
     }
 }
+
+/**
+ * @brief 开始执行一条路径
+ * @param path Point_t类型的数组，包含路径上所有点的坐标
+ * @param num_points 路径中的点数量
+ * @return 无
+ * @note 此函数会立即开始导航到路径的第一个点。
+ */
+void path_start(const Point_t path[], int num_points) {
+    // 1. 输入有效性检查
+    if (path == NULL || num_points <= 0) {
+        // 如果路径无效，则什么也不做
+        g_is_path_active = false;
+        return;
+    }
+
+    // 2. 初始化路径跟踪状态
+    g_current_path          = path;
+    g_total_path_points     = num_points;
+    g_current_point_index   = 0;
+    g_is_path_active        = true;
+
+    // 3. 导航到路径的第一个点
+    // 获取第一个点的坐标
+    Point_t first_point = g_current_path[g_current_point_index];
+    // 调用你现有的函数来开始任务
+    set_target_point(first_point.x, first_point.y);
+    
+    // 4. 将索引指向下一个点，为将来做准备
+    g_current_point_index++;
+    
+    // printf("Path started. Navigating to point 1: (%.2f, %.2f)\n", first_point.x, first_point.y);
+}
+
+/**
+ * @brief 路径跟踪更新函数，检查是否应前往下一个点
+ * @param  无
+ * @return 无
+ * @note 此函数必须与 navigation_update() 一同在主循环中被周期性调用。
+ */
+void path_update(void) {
+    // 1. 如果没有激活的路径任务，则直接返回
+    if (!g_is_path_active) {
+        return;
+    }
+
+    // 2. 检查单点导航是否完成 (关键触发器)
+    if (nav_state == NAV_IDLE) {
+        // 3. 检查路径中是否还有剩余的点
+        if (g_current_point_index < g_total_path_points) {
+            // 还有下一个点，开始导航
+            Point_t next_point = g_current_path[g_current_point_index];
+            set_target_point(next_point.x, next_point.y);
+
+            // printf("Point %d reached. Navigating to point %d: (%.2f, %.2f)\n", 
+            //        g_current_point_index, g_current_point_index + 1, next_point.x, next_point.y);
+
+            g_current_point_index++;
+
+        } else {
+            // 4. 所有点都已完成，路径结束
+            // printf("Path finished!\n");
+            g_is_path_active    = false;
+            g_current_path      = NULL; 
+            g_total_path_points = 0;
+        }
+    }
+}
+
+// /**
+//  * @brief 检查路径是否已经完成
+//  * @param  无
+//  * @return bool 如果路径已完成或未激活，返回true；否则返回false。
+//  */
+// bool path_is_finished(void) {
+//     return !g_is_path_active;
+// }
 
 // ---------- 内部辅助函数 ----------
 

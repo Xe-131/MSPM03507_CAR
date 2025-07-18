@@ -46,7 +46,7 @@ int main(void){
     // PID
     pid_init(&pid_motor_left, DELTA_PID, 0.1, 0.005, 0.00);
     pid_init(&pid_motor_right, DELTA_PID, 0.1, 0.001, 0.00);
-    pid_init(&pid_angle, POSITION_PID, 40, 0.005, 0);
+    pid_init(&pid_angle, POSITION_PID, 35, 0.005, 0);
     //
     pid_init(&pid_distance, DELTA_PID, 0.1, 0.005, 0);
     set_target_angle(0);
@@ -94,6 +94,16 @@ int main(void){
 
             // 开启路径规划
             set_target_point(150, -150);
+            Point_t path_test[] = {
+                {0.0f, 560.0f},  // 第1个点
+                {240.0f, 540.0f},  // 第2个点
+                {250.0f, 225.0f},  // 第3个点
+                {460.0f, 240.0f},   // 第4个点，回到原点
+                {453.0f, -160.0f},  // 第2个点
+                {125.0f, -150.0f},  // 第3个点
+                {-30.0f, 90.0f}   // 第4个点，回到原点
+            };
+            path_start(path_test, 7);
         }
 
         // PID 计算
@@ -104,10 +114,38 @@ int main(void){
         }
 
         // 通用定时
-        if(general_timer_flag == 1){
-            general_timer_flag    = 0;
-            navigation_update();
+
+        if(flag_100ms){
+            flag_100ms  = 0;
             
+            // 单点导航更新
+            navigation_update();
+            // 多点路径更新
+            path_update();
+        }
+
+        if(flag_1s){
+            flag_1s  = 0;
+
+            UART_send_string(UART_BLUEUART_INST, "coordinate: \r\n");
+            UART_send_float(UART_BLUEUART_INST, NOW_x);
+            UART_send_float(UART_BLUEUART_INST, NOW_y);
+            UART_send_float(UART_BLUEUART_INST, NOW_z);
+            UART_send_string(UART_BLUEUART_INST, "\r\nstate: \r\n");
+            if(nav_state == NAV_IDLE){
+                UART_send_int(UART_BLUEUART_INST, 11111);
+            }
+            else if(nav_state == NAV_ROTATING){
+                UART_send_int(UART_BLUEUART_INST, 22222);
+            }
+            else if(nav_state == NAV_MOVING){
+                UART_send_int(UART_BLUEUART_INST, 33333);
+            }
+            else if(nav_state == NAV_ARRIVED){
+                UART_send_int(UART_BLUEUART_INST, 44444);
+            }
+            UART_send_string(UART_BLUEUART_INST, "\r\nSPEED: \r\n");
+            UART_send_float(UART_BLUEUART_INST, target_speed_left);
         }
         
     }

@@ -89,8 +89,11 @@ void TIMER_INTOWHILE_INST_IRQHandler(void){
 }
 
 // 通用定时
-uint8_t general_timer_flag = 0;
+uint8_t flag_100ms  = 0;
+uint8_t flag_1s     = 0;
 void TIMER_GENERAL_INST_IRQHandler(void){
+    static uint8_t count_100ms = 0;
+
     switch (DL_TimerG_getPendingInterrupt(TIMER_GENERAL_INST)) {
         // 清零中断位
         case DL_TIMER_IIDX_ZERO:
@@ -98,7 +101,14 @@ void TIMER_GENERAL_INST_IRQHandler(void){
                 DL_Timer_setLoadValue(TIMER_GENERAL_INST, TIMER_GENERAL_PERIOD / 10.0);
                 DL_TimerG_startCounter(TIMER_GENERAL_INST);
 
-                general_timer_flag = 1;
+                count_100ms++;
+
+                flag_100ms     = 1;
+                if(count_100ms == 10){
+                    flag_1s = 1;
+                    // 清零
+                    count_100ms = 0;
+                }
             break;
         default:
             break;

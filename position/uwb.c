@@ -50,10 +50,6 @@ void mavlink_decode_receive_message(){
                 NOW_x   = uwb.x;
                 NOW_y   = uwb.y;
                 NOW_z   = uwb.z;               
-
-                UART_send_float(UART_BLUEUART_INST, NOW_x);
-                UART_send_float(UART_BLUEUART_INST, NOW_y);
-                UART_send_float(UART_BLUEUART_INST, NOW_z);
             }
             break;
             default:
