@@ -1,6 +1,10 @@
 #include "ti_msp_dl_config.h"
 #include "clock.h"
 
+// 初始化了SysTick ，每1ms 会触发一次中断
+// 这是移植MPU6050 时的附带文件，用于被MPU6050 驱动文件调用
+// 本项目并没有其他用途
+
 volatile unsigned long tick_ms;
 volatile uint32_t start_time;
 

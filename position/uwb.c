@@ -4,6 +4,7 @@
 #include "user.h"
 #include "position.h"
 
+// UWB 坐标结构体
 mavlink_global_vision_position_estimate_t uwb;
 
 /**
@@ -29,24 +30,13 @@ void mavlink_decode_receive_message(){
     if (mavlink_parse_char(chan, byte, &msg, &status)){
         switch(msg.msgid) {
             // // heartbeat
-            // case MAVLINK_MSG_ID_HEARTBEAT:
-            // {
-            //     mavlink_heartbeat_t heartbeat;
-            //     mavlink_msg_heartbeat_decode(&msg, &heartbeat);
-            //     // 打印
-            //     UART_send(0xAA);
-            //     UART_send(heartbeat.autopilot);
-            //     UART_send(heartbeat.base_mode);
-            //     UART_send(heartbeat.custom_mode);
-            //     UART_send(heartbeat.system_status);
-            //     UART_send(heartbeat.mavlink_version);
-            //     UART_send(0xAA);
+            // case MAVLINK_MSG_ID_HEARTBEAT:{
             // }
             // break;
             // UWB和陀螺仪
             case MAVLINK_MSG_ID_GLOBAL_VISION_POSITION_ESTIMATE:
             {
-                // mavlink_global_vision_position_estimate_t uwb;
+                // 获取UWB 坐标
                 mavlink_msg_global_vision_position_estimate_decode(&msg, &uwb);             
             }
             break;

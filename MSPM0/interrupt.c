@@ -73,7 +73,7 @@ void TIMER_PID_INST_IRQHandler(void){
     }
 }
 
-// 简单一次性定时
+// 简单一次性定时：用于等待MPU6050
 uint8_t into_wihle_flag = 0;
 void TIMER_INTOWHILE_INST_IRQHandler(void){
     switch (DL_TimerG_getPendingInterrupt(TIMER_INTOWHILE_INST)) {

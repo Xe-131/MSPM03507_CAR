@@ -9,11 +9,10 @@
 #include "mavlink.h"
 #include "position.h"
 
+// 测试函数
 bool run_all_paths_continuously(void);
 
 int main(void){
-    uint8_t usart_buffer[200];
-    
     SYSCFG_DL_init();
     // 开启测速的外部中断
     NVIC_EnableIRQ(GPIO_MULTIPLE_GPIOB_INT_IRQN);
@@ -49,18 +48,11 @@ int main(void){
     pid_init(&pid_motor_left, DELTA_PID, 0.1, 0.005, 0.00);
     pid_init(&pid_motor_right, DELTA_PID, 0.1, 0.001, 0.00);
     pid_init(&pid_angle, POSITION_PID, 35, 0.005, 0);
-    //
     pid_init(&pid_distance, DELTA_PID, -6, 0.005, 0);
     set_target_angle(0);
     set_target_speed(0);
 
-
     while (1) {
-
-        
-        
-        
-        
         // UWB 解析坐标
         mavlink_decode_receive_message();
         
@@ -90,38 +82,34 @@ int main(void){
             DL_Timer_setLoadValue(TIMER_PID_INST, TIMER_PID_PERIOD / 10.0);
             DL_TimerG_startCounter(TIMER_PID_INST);
 
-            //
             // diff_x = 30 - uwb.x;
             // diff_y = 130 - uwb.y;
             // // 开启路径规划
             // path_start(path_5, 4);
         }
 
-        // PID 计算
+        // 速度角度PID 计算
         if(pid_timer_flag == 1){
             pid_timer_flag    = 0;
 
-            pid_controal();  
-
-
-        // // --- 只需在循环中调用这一个函数 ---
-        run_all_paths_continuously();          
+            speed_angle_pid_controal();  
         }
 
         // 通用定时
-
         if(flag_100ms){
             flag_100ms  = 0;
             
-            // 单点导航更新
+            // 单点状态切换
             navigation_update();
-            // 多点路径更新
+            // 多点切换
             path_update();
+            // 多路径切换
+            run_all_paths_continuously(); 
         }
-
         if(flag_1s){
             flag_1s  = 0;
 
+            // 调试
             UART_send_string(UART_BLUEUART_INST, "coordinate: \r\n");
             UART_send_float(UART_BLUEUART_INST, NOW_x);
             UART_send_float(UART_BLUEUART_INST, NOW_y);

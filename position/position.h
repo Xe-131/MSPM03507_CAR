@@ -1,10 +1,6 @@
 #ifndef __POSITION_H__
 #define __POSITION_H__
-#include <stdbool.h> // 使用 bool, true, false
-
-// UWB 实时坐标：通过串口中断实时更新
-extern float NOW_x;
-extern float NOW_y;
+#include <stdbool.h> 
 
 extern float diff_x;
 extern float diff_y;
@@ -74,6 +70,7 @@ void navigation_update(void);
 void path_start(const Point_t path[], int num_points);
 void path_update(void);
 bool path_is_finished(void);
+
 // ---------- 内部辅助函数 ----------
 static float normalize_angle(float angle);
 

@@ -3,6 +3,7 @@
 // 所有电机的standby 是否关闭
 uint8_t motor_on_flag   = 0;
 
+// ---------- 公共接口函数 ----------
 /**
  * @brief   关闭所有电机的standby
  * @param   无

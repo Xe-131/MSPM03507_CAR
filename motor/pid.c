@@ -26,10 +26,7 @@ float   angle_init;
 // 目标角度: 
 float	target_angle	= 0;
 
-// 实际duty 值
-float   motor_pid_left_value;
-float   motor_pid_right_value;
-
+// ---------- 公共接口函数 ----------
 /**
  * @brief   初始化PID 参数
  * @param   pid PID 对象
@@ -46,6 +43,84 @@ void pid_init(pid_t *pid, uint32_t pid_mode, float p,  float i, float d){
 	pid->i	= i;
 }
 
+/**
+ * @brief   计算调用间隔的轮子速度，融合角度与速度PID 的输出，转化为duty，最后改变轮子的PWM
+ * @return  无
+ */
+void speed_angle_pid_controal(void){
+	float   angle_pid_value;
+	float   motor_pid_left_value;
+	float   motor_pid_right_value;
+
+	// 计算转速              
+	// mm/s
+	now_speed_left  = ((encode_cnt_left*(1.0)) / TIMER_PID_PERIOD) * 1000 / 260 * 150.79;
+	now_speed_right = ((encode_cnt_right*(1.0)) / TIMER_PID_PERIOD) * 1000 / 260 * 150.79;
+	// 归零计数器
+	encode_cnt_left     = 0;
+	encode_cnt_right    = 0;
+
+	// 计算角度PID: 输入角度差，输出速度值
+	angle_pid_value         = pid_calculate(&pid_angle, now_angle, target_angle);
+	// 给角度PID 输出设置上限，但调高P 值
+	if(angle_pid_value >= 700){
+		angle_pid_value = 700;
+	}
+	else if(angle_pid_value <= -700){
+		angle_pid_value	= -700;
+	}
+
+	// 计算速度PID：输入速度差，输出duty 值, 并限幅
+	motor_pid_left_value    = limit_float(pid_calculate(&pid_motor_left, now_speed_left, target_speed_left - angle_pid_value), -100, 100);
+	motor_pid_right_value   = limit_float(pid_calculate(&pid_motor_right, now_speed_right, target_speed_right + angle_pid_value),-100, 100);
+	
+	// 设置duty
+	Set_Duty(LEFT, motor_pid_left_value);
+	Set_Duty(RIGHT, motor_pid_right_value);
+}
+
+/**
+ * @brief   重置PID 所有中间变量(除了参数p, i, d, pid_mode)
+ * @param   pid PID 对象
+ * @return  无
+ */
+void reset_pid(pid_t* pid){
+	pid->target		= 0;
+	pid->now		= 0;
+	pid->error[0]	= 0;
+	pid->error[1]	= 0;
+	pid->error[2]	= 0;
+	pid->dout		= 0;
+	pid->iout		= 0;
+	pid->pout		= 0;
+	pid->out		= 0;
+}
+
+/**
+ * @brief   改变目标速度
+ * @param   speed 速度值，范围在[-1000, 1000]
+ * @return  无
+ * @note 这里的范围是软范围，具体得看小车在PWM 为100 时的速度值
+ */
+void set_target_speed(float speed){
+	speed = limit_float(speed, -1000, 1000);
+
+	target_speed_left	= speed;
+	target_speed_right	= speed;
+}
+
+/**
+ * @brief   改变目标角度
+ * @param   angle 角度值，范围在[0, 360)
+ * @return  无
+ */
+void set_target_angle(float angle){
+	angle = limit_float(angle, 0, 359.99);
+
+	target_angle	= angle;
+}
+
+// ---------- 内部辅助函数 ----------
 /**
  * @brief   计算PID 的输出, 并把中间值保存到PID 对象中
  * @param   pid PID 对象
@@ -93,58 +168,6 @@ float pid_calculate(pid_t *pid, float now, float target){
 }
 
 /**
- * @brief   计算调用间隔的轮子速度，融合角度与速度PID 的输出，转化为duty，最后改变轮子的PWM
- * @return  无
- */
-void pid_controal(void){
-	float   angle_pid_value;
-
-
-	// 计算转速              
-	// mm/s
-	now_speed_left  = ((encode_cnt_left*(1.0)) / TIMER_PID_PERIOD) * 1000 / 260 * 150.79;
-	now_speed_right = ((encode_cnt_right*(1.0)) / TIMER_PID_PERIOD) * 1000 / 260 * 150.79;
-	// 归零计数器
-	encode_cnt_left     = 0;
-	encode_cnt_right    = 0;
-
-	// 计算角度PID: 输入角度差，输出速度值
-	angle_pid_value         = pid_calculate(&pid_angle, now_angle, target_angle);
-	// 给角度PID 输出设置上限，但调高P 值
-	if(angle_pid_value >= 700){
-		angle_pid_value = 700;
-	}
-	else if(angle_pid_value <= -700){
-		angle_pid_value	= -700;
-	}
-
-	// 计算速度PID：输入速度差，输出duty 值, 并限幅
-	motor_pid_left_value    = limit_float(pid_calculate(&pid_motor_left, now_speed_left, target_speed_left - angle_pid_value), -100, 100);
-	motor_pid_right_value   = limit_float(pid_calculate(&pid_motor_right, now_speed_right, target_speed_right + angle_pid_value),-100, 100);
-	
-	// 设置duty
-	Set_Duty(LEFT, motor_pid_left_value);
-	Set_Duty(RIGHT, motor_pid_right_value);
-}
-
-/**
- * @brief   重置PID 所有中间变量(除了参数p, i, d, pid_mode)
- * @param   pid PID 对象
- * @return  无
- */
-void reset_pid(pid_t* pid){
-	pid->target		= 0;
-	pid->now		= 0;
-	pid->error[0]	= 0;
-	pid->error[1]	= 0;
-	pid->error[2]	= 0;
-	pid->dout		= 0;
-	pid->iout		= 0;
-	pid->pout		= 0;
-	pid->out		= 0;
-}
-
-/**
  * @brief   始终让误差在 [-180, 180] 区间内，消除反复震荡
  * @param   target 目标角度
  * @param   now 实时角度
@@ -170,28 +193,4 @@ float limit_float(float value, float min, float max){
     if (value < min) return min;
     if (value > max) return max;
     return value;
-}
-
-/**
- * @brief   改变目标速度
- * @param   speed 速度值，范围在[-1000, 1000]
- * @return  无
- * @note 这里的范围是软范围，具体得看小车在PWM 为100 时的速度值
- */
-void set_target_speed(float speed){
-	speed = limit_float(speed, -1000, 1000);
-
-	target_speed_left	= speed;
-	target_speed_right	= speed;
-}
-
-/**
- * @brief   改变目标角度
- * @param   angle 角度值，范围在[0, 360)
- * @return  无
- */
-void set_target_angle(float angle){
-	angle = limit_float(angle, 0, 359.99);
-
-	target_angle	= angle;
 }

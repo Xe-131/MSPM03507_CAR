@@ -1,7 +1,7 @@
 #include "user.h"
 #include "string.h"
 
-// 通用------------------------------
+// ---------- 串口通用函数 ----------
 void UART_send_byte(UART_Regs *uart, uint8_t data) {
     while (DL_UART_isTXFIFOFull(uart)) {
     }

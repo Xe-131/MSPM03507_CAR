@@ -6,10 +6,9 @@
 #include "pid.h"
 #include "uwb.h"
 
-// UWB 实时坐标
-//宏定义在 头文件中
-// float NOW_x;
-// float NOW_y;
+// UWB 实时坐标：宏定义在头文件
+// #define NOW_x (uwb.x + diff_x)
+// #define NOW_y (uwb.y + diff_y)
 
 float diff_x = 0;
 float diff_y = 0;
@@ -60,45 +59,62 @@ Point_t path_6[] = {
 };
 // 反向路径
 Point_t reverse_path_1[] = {
-    POINT_1,    // 来自 path_1 的倒数第1个点
-    POINT_10,   // 统一终点
+    POINT_1,    
+    POINT_10,   
 };
 Point_t reverse_path_2[] = {
-    POINT_1,    // 来自 path_2 的倒数第1个点
-    POINT_10,   // 统一终点
+    POINT_1,    
+    POINT_10,   
 };
 Point_t reverse_path_3[] = {
-    POINT_9,    // 来自 path_3 的倒数第1个点
-    POINT_10,   // 统一终点
+    POINT_9,    
+    POINT_10,   
 };
 Point_t reverse_path_4[] = {
-    POINT_6,    // 来自 path_4 的倒数第1个点
-    POINT_8,    // 来自 path_4 的倒数第2个点
-    POINT_9,    // 来自 path_4 的倒数第3个点
-    POINT_10,   // 统一终点
+    POINT_6,   
+    POINT_8,   
+    POINT_9,   
+    POINT_10,   
 };
 Point_t reverse_path_5[] = {
-    POINT_3,    // 来自 path_5 的倒数第1个点
-    POINT_2,    // 来自 path_5 的倒数第2个点
-    POINT_1,    // 来自 path_5 的倒数第3个点
-    POINT_10,   // 统一终点
+    POINT_3,    
+    POINT_2,    
+    POINT_1,    
+    POINT_10,   
 };
 Point_t reverse_path_6[] = {
-    POINT_3,    // 来自 path_6 的倒数第1个点
-    POINT_2,    // 来自 path_6 的倒数第2个点
-    POINT_1,    // 来自 path_6 的倒数第3个点
-    POINT_10,   // 统一终点
+    POINT_3,    
+    POINT_2,    
+    POINT_1,    
+    POINT_10,
 };
-// ---------- 公共接口函数 ----------
 
-/**
- * @brief   
- * @param   
- * @param   
- * @param   
- * @return  
- * @note 
- */
+// ---------- 公共接口函数 ----------
+/*
+下面的函数使用方法如下：
+    1.导航到(X, Y):
+        // 主循环之前
+        set_target_point(X, Y);
+        // 主循环
+        while(1){
+            // 周期调用
+            if(){
+                navigation_update();
+            }
+        }
+
+    1.跑完包含N 个点的PATH 路径:
+        // 主循环之前
+        path_start(PATH, N);
+        // 主循环
+        while(1){
+            // 周期调用
+            if(){
+                navigation_update();
+                path_update();
+            }
+        }
+*/
 
 /**
  * @brief 导航到点(x, y)
@@ -229,7 +245,7 @@ void set_target_point(float x, float y){
  * @param path Point_t类型的数组，包含路径上所有点的坐标
  * @param num_points 路径中的点数量
  * @return 无
- * @note 此函数会立即开始导航到路径的第一个点。
+ * @note 需要配合path_update 函数使用
  */
 void path_start(const Point_t path[], int num_points) {
     // 1. 输入有效性检查
