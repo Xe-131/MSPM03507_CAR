@@ -4,16 +4,19 @@
 #include "mpu6050.h"
 #include "user.h"
 #include "pid.h"
+#include "uwb.h"
 
 // UWB 实时坐标
-float NOW_x;
-float NOW_y;
-float NOW_z;
+//宏定义在 头文件中
+// float NOW_x;
+// float NOW_y;
+
+float diff_x = 0;
+float diff_y = 0;
 
 // 目的坐标
 float TARGET_x;
 float TARGET_y;
-float TARGET_z;
 
 // 导航状态
 NavigationState_t nav_state = NAV_IDLE;
@@ -24,6 +27,68 @@ static int g_total_path_points          = 0;          // 当前路径的总点�
 static int g_current_point_index        = 0;        // 当前目标点在路径中的索引
 static bool g_is_path_active            = false;        // 路径跟踪是否正在进行中
 
+// 固定路线
+Point_t path_1[] = {
+    POINT_1,
+    POINT_2,   
+};
+Point_t path_2[] = {
+    POINT_1,
+    POINT_2,   
+};
+Point_t path_3[] = {
+    POINT_9,
+    POINT_8,   
+};
+Point_t path_4[] = {
+    POINT_9,
+    POINT_8,
+    POINT_6,
+    POINT_7,   
+};
+Point_t path_5[] = {
+    POINT_1,
+    POINT_2,
+    POINT_3,
+    POINT_5,   
+};
+Point_t path_6[] = {
+    POINT_1,
+    POINT_2,
+    POINT_3,
+    POINT_4,   
+};
+// 反向路径
+Point_t reverse_path_1[] = {
+    POINT_1,    // 来自 path_1 的倒数第1个点
+    POINT_10,   // 统一终点
+};
+Point_t reverse_path_2[] = {
+    POINT_1,    // 来自 path_2 的倒数第1个点
+    POINT_10,   // 统一终点
+};
+Point_t reverse_path_3[] = {
+    POINT_9,    // 来自 path_3 的倒数第1个点
+    POINT_10,   // 统一终点
+};
+Point_t reverse_path_4[] = {
+    POINT_6,    // 来自 path_4 的倒数第1个点
+    POINT_8,    // 来自 path_4 的倒数第2个点
+    POINT_9,    // 来自 path_4 的倒数第3个点
+    POINT_10,   // 统一终点
+};
+Point_t reverse_path_5[] = {
+    POINT_3,    // 来自 path_5 的倒数第1个点
+    POINT_2,    // 来自 path_5 的倒数第2个点
+    POINT_1,    // 来自 path_5 的倒数第3个点
+    POINT_10,   // 统一终点
+};
+Point_t reverse_path_6[] = {
+    POINT_3,    // 来自 path_6 的倒数第1个点
+    POINT_2,    // 来自 path_6 的倒数第2个点
+    POINT_1,    // 来自 path_6 的倒数第3个点
+    POINT_10,   // 统一终点
+};
 // ---------- 公共接口函数 ----------
 
 /**
@@ -59,6 +124,8 @@ void set_target_point(float x, float y){
     static int rotation_stable_counter = 0;
     // 距离稳定计数
     static int distance_stable_counter = 0;
+    // 距离PID 输出
+    float diatance_pid_out;
 
     // 计算当前位置到目标的向量和距离
     float dx = TARGET_x - NOW_x;
@@ -103,7 +170,10 @@ void set_target_point(float x, float y){
             if (rotation_stable_counter >= ROTATION_STABLE_FRAMES) {
                 // 稳定时间足够长，可以安全地切换到前进状态
                 nav_state = NAV_MOVING;     
-                rotation_stable_counter = 0;       
+                rotation_stable_counter = 0;  
+                // 重置距离PID
+                reset_pid(&pid_distance);   
+                return;  
             }
             break;
         }
@@ -119,27 +189,25 @@ void set_target_point(float x, float y){
             }
             if (distance_stable_counter >= DISTANCE_STABLE_FRAMES) {
                 nav_state = NAV_ARRIVED;     
-                distance_stable_counter = 0;       
+                distance_stable_counter = 0;    
+                return;   
             }
             // 2. 实时计算并更新目标角度，用于航向保持
             float math_angle_deg = atan2f(dx, dy) * 180.0f / M_PI;
             float target_angle = normalize_angle(math_angle_deg - 90.0f);
             set_target_angle(target_angle);
             
-            // 3. 根据距离动态计算前进速度 (P控制器)
-            // float desired_speed = distance_to_target * KP_DISTANCE_TO_SPEED;
-            
-            // 4. 对速度进行限幅
-            // desired_speed = limit_float(desired_speed, 0, MAX_FORWARD_SPEED);
-            
-            // 5. 设置目标速度
-            set_target_speed(100);
-            if(distance_to_target >= 120){
-                set_target_speed(475);
+            // PID 调节速度:PID 输出为速度值
+            diatance_pid_out = pid_calculate(&pid_distance, distance_to_target, 0);
+            // 限幅
+            if(diatance_pid_out >= 400){
+                diatance_pid_out = 400;
             }
-            else{
-                set_target_speed(50);
+            else if(diatance_pid_out <= -400){
+                diatance_pid_out = -400;
             }
+            // 设置速度
+            set_target_speed(diatance_pid_out);
             
             break;
         }
@@ -149,7 +217,7 @@ void set_target_point(float x, float y){
             set_target_speed(0);
             // 可以在这里设置目标角度为当前角度，防止漂移
             set_target_angle(now_angle);
-            
+
             // 转换到空闲状态，等待下一个指令
             nav_state = NAV_IDLE;
             break;
@@ -224,14 +292,14 @@ void path_update(void) {
     }
 }
 
-// /**
-//  * @brief 检查路径是否已经完成
-//  * @param  无
-//  * @return bool 如果路径已完成或未激活，返回true；否则返回false。
-//  */
-// bool path_is_finished(void) {
-//     return !g_is_path_active;
-// }
+/**
+ * @brief 检查路径是否已经完成
+ * @param  无
+ * @return bool 如果路径已完成或未激活，返回true；否则返回false。
+ */
+bool path_is_finished(void) {
+    return !g_is_path_active;
+}
 
 // ---------- 内部辅助函数 ----------
 

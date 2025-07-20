@@ -4,6 +4,8 @@
 #include "user.h"
 #include "position.h"
 
+mavlink_global_vision_position_estimate_t uwb;
+
 /**
  * @brief 解析mavlink 串口存储在缓冲区的一个字节，在刚好解析完成一个包时可以选择触发某些操作
  * @return 无
@@ -44,12 +46,8 @@ void mavlink_decode_receive_message(){
             // UWB和陀螺仪
             case MAVLINK_MSG_ID_GLOBAL_VISION_POSITION_ESTIMATE:
             {
-                mavlink_global_vision_position_estimate_t uwb;
-                mavlink_msg_global_vision_position_estimate_decode(&msg, &uwb);
-                
-                NOW_x   = uwb.x;
-                NOW_y   = uwb.y;
-                NOW_z   = uwb.z;               
+                // mavlink_global_vision_position_estimate_t uwb;
+                mavlink_msg_global_vision_position_estimate_decode(&msg, &uwb);             
             }
             break;
             default:
