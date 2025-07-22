@@ -195,6 +195,7 @@ TIMER3.peripheral.$assign = "TIMG6";
 
 UART1.$name                            = "UART_PC";
 UART1.targetBaudRate                   = 115200;
+UART1.enabledInterrupts                = ["RX"];
 UART1.peripheral.rxPin.$assign         = "PA11";
 UART1.peripheral.txPin.$assign         = "PA10";
 UART1.txPinConfig.direction            = scripting.forceWrite("OUTPUT");
@@ -206,6 +207,8 @@ UART1.rxPinConfig.hideOutputInversion  = scripting.forceWrite(false);
 UART1.rxPinConfig.onlyInternalResistor = scripting.forceWrite(false);
 UART1.rxPinConfig.passedPeripheralType = scripting.forceWrite("Digital");
 UART1.rxPinConfig.$name                = "ti_driverlib_gpio_GPIOPinGeneric3";
+UART1.rxPinConfig.enableConfig         = true;
+UART1.rxPinConfig.internalResistor     = "PULL_UP";
 
 UART2.$name                            = "UART_MAVLINK";
 UART2.enabledInterrupts                = ["RX"];

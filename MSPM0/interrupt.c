@@ -4,6 +4,7 @@
 #include "pid.h"
 #include "user.h"
 #include "mpu6050.h"
+#include "ring_buffer.h"
 
 // SysTick 中断，每隔1ms 发送一次
 void SysTick_Handler(void)
@@ -116,25 +117,15 @@ void TIMER_GENERAL_INST_IRQHandler(void){
 }
 
 // UART_MAVLINK 接收中断
-// 读取缓冲区
-// #define UART_RX_BUFFER_SIZE 30 定义在头文件中
-uint8_t uart_rx_buffer[UART_RX_BUFFER_SIZE];
-uint16_t uart_rx_head = 0;
-uint16_t uart_rx_tail = 0;
+// 读取数据写到缓冲区里面
 void UART_MAVLINK_INST_IRQHandler(void)
 {
     switch (DL_UART_Main_getPendingInterrupt(UART_MAVLINK_INST)) {
         case DL_UART_MAIN_IIDX_RX:
         {
             uint8_t data        = DL_UART_Main_receiveData(UART_MAVLINK_INST);
-            uint16_t next_head  = (uart_rx_head + 1) % UART_RX_BUFFER_SIZE;
+            RingBuffer_Write(&uart_mavlink_rx_buffer, data);
 
-            // 缓冲区未满
-            if (next_head != uart_rx_tail) {
-                uart_rx_buffer[uart_rx_head] = data;
-                uart_rx_head = next_head;
-            }
-            // 否则缓冲区满，丢弃数据
             break;
         }
         default:
@@ -142,7 +133,21 @@ void UART_MAVLINK_INST_IRQHandler(void)
     }
 }
 
-
+// UART_PC 接收中断
+// 读取数据写到缓冲区里面
+void UART_PC_INST_IRQHandler(void)
+{
+    switch (DL_UART_Main_getPendingInterrupt(UART_PC_INST)) {
+        case DL_UART_MAIN_IIDX_RX:
+        {
+            uint8_t data        = DL_UART_Main_receiveData(UART_PC_INST);
+            RingBuffer_Write(&uart_pc_rx_buffer, data);
+            break;
+        }
+        default:
+            break;
+    }
+}
 
 void NMI_Handler(void)
 {
@@ -214,12 +219,6 @@ void UART2_IRQHandler(void)
 {
     __BKPT();
 }
-
-void UART0_IRQHandler(void)
-{
-    __BKPT();
-}
-
 
 
 

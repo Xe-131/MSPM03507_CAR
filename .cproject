@@ -47,6 +47,7 @@
                                     <listOptionValue value="${PROJECT_ROOT}/OLED_Hardware_I2C"/>
                                     <listOptionValue value="${PROJECT_ROOT}/MSPM0"/>
                                     <listOptionValue value="${PROJECT_ROOT}/MPU6050"/>
+                                    <listOptionValue value="${PROJECT_ROOT}/xe_protocol"/>
                                 </option>
                                 <option id="com.ti.ccstudio.buildDefinitions.TMS470_TICLANG_4.0.compilerID.DEFINE.1212966463" superClass="com.ti.ccstudio.buildDefinitions.TMS470_TICLANG_4.0.compilerID.DEFINE" valueType="definedSymbols">
                                     <listOptionValue value="${COM_TI_MSPM0_SDK_SYMBOLS}"/>

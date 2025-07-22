@@ -5,6 +5,6 @@
 
 extern mavlink_global_vision_position_estimate_t uwb;
 
-void mavlink_decode_receive_message();
+void mavlink_decode_receive_message(uint8_t byte);
 
 #endif

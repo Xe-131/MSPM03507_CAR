@@ -8,12 +8,28 @@
 #include "uwb.h"
 #include "mavlink.h"
 #include "position.h"
+#include "ring_buffer.h"
+#include "xe_protocol.h"
 
 // 测试函数
 bool run_all_paths_continuously(void);
 
 int main(void){
+    // 串口临时数据
+    uint8_t byte_from_buffer;
+
     SYSCFG_DL_init();
+
+    // 串口缓冲区初始化
+    RingBuffer_Init(&uart_pc_rx_buffer, uart_pc_rx_buffer_data, UART_PC_BUFFER_SIZE);
+    RingBuffer_Init(&uart_mavlink_rx_buffer, uart_mavlink_rx_buffer_data, UART_MAVLINK_BUFFER_SIZE);
+
+    // UART_PC 中断
+    NVIC_ClearPendingIRQ(UART_PC_INST_INT_IRQN);
+    NVIC_EnableIRQ(UART_PC_INST_INT_IRQN);
+    // UART_MAVLINK 中断
+    NVIC_ClearPendingIRQ(UART_MAVLINK_INST_INT_IRQN);
+    NVIC_EnableIRQ(UART_MAVLINK_INST_INT_IRQN);
     // 开启测速的外部中断
     NVIC_EnableIRQ(GPIO_MULTIPLE_GPIOB_INT_IRQN);
     NVIC_EnableIRQ(GPIO_ENCODER_RIGHT_INT_IRQN);
@@ -26,9 +42,7 @@ int main(void){
     // TIMER_GENERAL 开始计时
     DL_Timer_setLoadValue(TIMER_GENERAL_INST, TIMER_GENERAL_PERIOD / 10.0);
     DL_Timer_startCounter(TIMER_GENERAL_INST);
-    // UART_MAVLINK 中断
-    NVIC_ClearPendingIRQ(UART_MAVLINK_INST_INT_IRQN);
-    NVIC_EnableIRQ(UART_MAVLINK_INST_INT_IRQN);
+
 
     // systick
     SysTick_Init();
@@ -53,8 +67,16 @@ int main(void){
     set_target_speed(0);
 
     while (1) {
-        // UWB 解析坐标
-        mavlink_decode_receive_message();
+        // 处理串口缓冲区数据
+        if (RingBuffer_Read(&uart_pc_rx_buffer, &byte_from_buffer)) {
+            // 解析树莓派指令，私有协议
+            Protocol_ParseByte(byte_from_buffer);
+        }
+        if (RingBuffer_Read(&uart_mavlink_rx_buffer, &byte_from_buffer)) {
+            // UWB 解析坐标
+            mavlink_decode_receive_message(byte_from_buffer);
+        }
+
         
         // 开关电机
         if(S2_flag == 1){
@@ -76,7 +98,8 @@ int main(void){
             reset_pid(&pid_motor_left);
             reset_pid(&pid_motor_right);
             reset_pid(&pid_angle);
-            Motor_On();
+            // 这里没开电机，一定要记得开啊啊啊啊啊啊啊啊啊啊啊啊啊
+            // Motor_On();
 
             // TIMER_PID 
             DL_Timer_setLoadValue(TIMER_PID_INST, TIMER_PID_PERIOD / 10.0);
@@ -109,25 +132,27 @@ int main(void){
         if(flag_1s){
             flag_1s  = 0;
 
-            // 调试
-            UART_send_string(UART_BLUEUART_INST, "coordinate: \r\n");
-            UART_send_float(UART_BLUEUART_INST, NOW_x);
-            UART_send_float(UART_BLUEUART_INST, NOW_y);
-            UART_send_string(UART_BLUEUART_INST, "\r\nstate: \r\n");
-            if(nav_state == NAV_IDLE){
-                UART_send_int(UART_BLUEUART_INST, 11111);
-            }
-            else if(nav_state == NAV_ROTATING){
-                UART_send_int(UART_BLUEUART_INST, 22222);
-            }
-            else if(nav_state == NAV_MOVING){
-                UART_send_int(UART_BLUEUART_INST, 33333);
-            }
-            else if(nav_state == NAV_ARRIVED){
-                UART_send_int(UART_BLUEUART_INST, 44444);
-            }
-            UART_send_string(UART_BLUEUART_INST, "\r\nSPEED: \r\n");
-            UART_send_float(UART_BLUEUART_INST, target_speed_left);
+            // // 调试
+            // UART_send_string(UART_BLUEUART_INST, "coordinate: \r\n");
+            // UART_send_float(UART_BLUEUART_INST, NOW_x);
+            // UART_send_float(UART_BLUEUART_INST, NOW_y);
+            // UART_send_string(UART_BLUEUART_INST, "\r\nstate: \r\n");
+            // if(nav_state == NAV_IDLE){
+            //     UART_send_int(UART_BLUEUART_INST, 11111);
+            // }
+            // else if(nav_state == NAV_ROTATING){
+            //     UART_send_int(UART_BLUEUART_INST, 22222);
+            // }
+            // else if(nav_state == NAV_MOVING){
+            //     UART_send_int(UART_BLUEUART_INST, 33333);
+            // }
+            // else if(nav_state == NAV_ARRIVED){
+            //     UART_send_int(UART_BLUEUART_INST, 44444);
+            // }
+            // UART_send_string(UART_BLUEUART_INST, "\r\nSPEED: \r\n");
+            // UART_send_float(UART_BLUEUART_INST, target_speed_left);
+
+            Send_DronePosition(UART_PC_INST, 1.234, -5.222, 3.01);
         }
         
     }
