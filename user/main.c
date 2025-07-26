@@ -59,8 +59,8 @@ int main(void){
     Motor_Off();
 
     // PID
-    pid_init(&pid_motor_left, DELTA_PID, 0.1, 0.005, 0.00);
-    pid_init(&pid_motor_right, DELTA_PID, 0.1, 0.001, 0.00);
+    pid_init(&pid_motor_left, DELTA_PID, 0.15, 0.005, 0.00);
+    pid_init(&pid_motor_right, DELTA_PID, 0.15, 0.001, 0.00);
     pid_init(&pid_angle, POSITION_PID, 35, 0.005, 0);
     pid_init(&pid_distance, DELTA_PID, -6, 0.005, 0);
     set_target_angle(0);
@@ -99,15 +99,15 @@ int main(void){
             reset_pid(&pid_motor_right);
             reset_pid(&pid_angle);
             // 这里没开电机，一定要记得开啊啊啊啊啊啊啊啊啊啊啊啊啊
-            // Motor_On();
+            Motor_On();
 
             // TIMER_PID 
             DL_Timer_setLoadValue(TIMER_PID_INST, TIMER_PID_PERIOD / 10.0);
             DL_TimerG_startCounter(TIMER_PID_INST);
 
-            // diff_x = 30 - uwb.x;
-            // diff_y = 130 - uwb.y;
-            // // 开启路径规划
+            // diff_x = 24 - uwb.x;
+            // diff_y = 120 - uwb.y;
+            // 开启路径规划
             // path_start(path_5, 4);
         }
 
@@ -132,31 +132,33 @@ int main(void){
         if(flag_1s){
             flag_1s  = 0;
 
-            // // 调试
-            // UART_send_string(UART_BLUEUART_INST, "coordinate: \r\n");
-            // UART_send_float(UART_BLUEUART_INST, NOW_x);
-            // UART_send_float(UART_BLUEUART_INST, NOW_y);
-            // UART_send_string(UART_BLUEUART_INST, "\r\nstate: \r\n");
-            // if(nav_state == NAV_IDLE){
-            //     UART_send_int(UART_BLUEUART_INST, 11111);
-            // }
-            // else if(nav_state == NAV_ROTATING){
-            //     UART_send_int(UART_BLUEUART_INST, 22222);
-            // }
-            // else if(nav_state == NAV_MOVING){
-            //     UART_send_int(UART_BLUEUART_INST, 33333);
-            // }
-            // else if(nav_state == NAV_ARRIVED){
-            //     UART_send_int(UART_BLUEUART_INST, 44444);
-            // }
-            // UART_send_string(UART_BLUEUART_INST, "\r\nSPEED: \r\n");
-            // UART_send_float(UART_BLUEUART_INST, target_speed_left);
+            // 调试
+            UART_send_string(UART_BLUEUART_INST, "coordinate: \r\n");
+            UART_send_float(UART_BLUEUART_INST, NOW_x);
+            UART_send_float(UART_BLUEUART_INST, NOW_y);
+            UART_send_string(UART_BLUEUART_INST, "\r\nstate: \r\n");
+            if(nav_state == NAV_IDLE){
+                UART_send_int(UART_BLUEUART_INST, 11111);
+            }
+            else if(nav_state == NAV_ROTATING){
+                UART_send_int(UART_BLUEUART_INST, 22222);
+            }
+            else if(nav_state == NAV_MOVING){
+                UART_send_int(UART_BLUEUART_INST, 33333);
+            }
+            else if(nav_state == NAV_ARRIVED){
+                UART_send_int(UART_BLUEUART_INST, 44444);
+            }
+            UART_send_string(UART_BLUEUART_INST, "\r\nSPEED: \r\n");
+            UART_send_float(UART_BLUEUART_INST, target_speed_left);
 
-            Send_DronePosition(UART_PC_INST, 1.234, -5.222, 3.01);
+            // Send_DronePosition(UART_PC_INST, NOW_x, NOW_y, 0);
         }
         
     }
 }
+
+
 
 
 
